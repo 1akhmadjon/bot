@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-API_TOKEN = '6548777750:AAE4rCWTaHD5uXyxpGO9dnNE2q9vg4d9RHA'
+API_TOKEN = '6338497392:AAGfIbiSMt4qTb7HX-LYeFcnYfQIfl7Wn4M'
 
 logging.basicConfig(level=logging.INFO)
 
