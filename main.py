@@ -7,7 +7,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
 
-API_TOKEN = '6338497392:AAGfIbiSMt4qTb7HX-LYeFcnYfQIfl7Wn4M'
+API_TOKEN = '6548777750:AAE4rCWTaHD5uXyxpGO9dnNE2q9vg4d9RHA'
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,7 +26,7 @@ async def send_welcome(message: types.Message):
 async def handle_message(message: types.Message):
     text = message.text
 
-    if text.startswith("https://youtu.be/"):
+    if text.startswith(("https://youtube.com", "https://youtu.be/")):
         keyboard = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Video", callback_data=f"yt_video_{text}")],
             [InlineKeyboardButton(text="MP3", callback_data=f"yt_mp3_{text}")]
@@ -36,7 +36,7 @@ async def handle_message(message: types.Message):
     elif text.startswith("https://www.instagram.com/"):
         result = get_ig_vd(text)
         await message.answer_video(result)
-    elif text.startswith("https://vt.tiktok.com/" or "https://tiktok.com"):
+    elif text.startswith(("https://vt.tiktok.com/", "https://tiktok.com")):
         result = tiktok_vd(text)
         await message.answer_video(result)
     else:
