@@ -1,4 +1,6 @@
 import logging
+import re
+
 import asyncio
 import requests
 from aiogram import Bot, Dispatcher, types
@@ -59,21 +61,19 @@ async def process_callback(callback_query: types.CallbackQuery):
     await callback_query.message.delete()
     await callback_query.answer()
 
-async def main():
-    await dp.start_polling(bot)
 
 def get_yt_mp3(vd_url):
-	url = "https://youtube-mp3-downloader2.p.rapidapi.com/ytmp3/ytmp3/"
+	url = "https://youtube-mp3-download3.p.rapidapi.com/downloads/convert_audio"
 
-	querystring = {"url": vd_url}
+	querystring = {"url": vd_url, "format": "mp3"}
 
 	headers = {
 		"x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
-		"x-rapidapi-host": "youtube-mp3-downloader2.p.rapidapi.com"
+		"x-rapidapi-host": "youtube-mp3-download3.p.rapidapi.com"
 	}
 
 	response = requests.get(url, headers=headers, params=querystring)
-	return response.json()['dlink']
+	return response.json()['url']
 
 
 def get_yt_mp4(vd_url):
@@ -131,5 +131,9 @@ def tiktok_vd(vd_url):
 	video_url = medias[1].get('url', None)
 	return video_url
 
+
+async def main():
+	await dp.start_polling(bot)
+
 if __name__ == '__main__':
-    asyncio.run(main())
+	asyncio.run(main())
