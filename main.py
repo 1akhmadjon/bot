@@ -21,59 +21,64 @@ dp = Dispatcher(storage=storage)
 
 @dp.message(Command("start"))
 async def send_welcome(message: types.Message):
-    await message.reply("Hi! Send me a YouTube or Instagram link to get started!")
+	await message.reply("Hi! Send me a YouTube or Instagram link to get started!")
 
 
 @dp.message()
 async def handle_message(message: types.Message):
-    text = message.text
+	text = message.text
 
-    if text.startswith(("https://youtube.com", "https://youtu.be/")):
-        keyboard = InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Video", callback_data=f"yt_video_{text}")],
-            [InlineKeyboardButton(text="MP3", callback_data=f"yt_mp3_{text}")]
-        ])
-        await message.answer("Choose the format:", reply_markup=keyboard)
+	if text.startswith(("https://youtube.com", "https://youtu.be/")):
+		keyboard = InlineKeyboardMarkup(inline_keyboard=[
+			[InlineKeyboardButton(text="Video", callback_data=f"yt_video_{text}")],
+			[InlineKeyboardButton(text="MP3", callback_data=f"yt_mp3_{text}")]
+		])
+		await message.answer("Choose the format:", reply_markup=keyboard)
 
-    elif text.startswith("https://www.instagram.com/"):
-        result = get_ig_vd(text)
-        await message.answer_video(result)
-    elif text.startswith(("https://vt.tiktok.com/", "https://tiktok.com")):
-        result = tiktok_vd(text)
-        await message.answer_video(result)
-    else:
-        await message.answer("Please send a valid YouTube or Instagram URL.")
+	elif text.startswith("https://www.instagram.com/"):
+		result = get_ig_vd(text)
+		await message.answer_video(result)
+	elif text.startswith(("https://vt.tiktok.com/", "https://tiktok.com")):
+		result = tiktok_vd(text)
+		await message.answer_video(result)
+	else:
+		await message.answer("Please send a valid YouTube or Instagram URL.")
 
 
 
 # Callback handler for the inline keyboard
 @dp.callback_query(lambda callback_query: callback_query.data.startswith('yt_'))
 async def process_callback(callback_query: types.CallbackQuery):
-    action = callback_query.data
-    vd_url = callback_query.data.split("_", 2)
-    if action.startswith('yt_video'):
-        result = get_yt_mp4(vd_url[2])
-        await callback_query.message.answer_video(result)
+	action = callback_query.data
+	vd_url = callback_query.data.split("_", 2)
+	if action.startswith('yt_video'):
+		result = get_yt_mp4(vd_url[2])
+		await callback_query.message.answer_video(result)
 
-    elif action.startswith('yt_mp3'):
-        result = get_yt_mp3(vd_url[2])
-        await bot.send_audio(chat_id=callback_query.from_user.id, audio=result)
-    await callback_query.message.delete()
-    await callback_query.answer()
+	elif action.startswith('yt_mp3'):
+		result = get_yt_mp3(vd_url[2])
+		# await bot.send_message(chat_id=callback_query.from_user.id,text="Is not working")
+		await bot.send_audio(chat_id=callback_query.from_user.id, audio=result)
+
+	await callback_query.message.delete()
+	await callback_query.answer()
 
 
 def get_yt_mp3(vd_url):
-	url = "https://youtube-mp3-download3.p.rapidapi.com/downloads/convert_audio"
+	url = "https://yt-search-and-download-mp3.p.rapidapi.com/mp3"
 
-	querystring = {"url": vd_url, "format": "mp3"}
+	querystring = {"url": vd_url}
 
 	headers = {
 		"x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
-		"x-rapidapi-host": "youtube-mp3-download3.p.rapidapi.com"
+		"x-rapidapi-host": "yt-search-and-download-mp3.p.rapidapi.com"
 	}
 
 	response = requests.get(url, headers=headers, params=querystring)
-	return response.json()['url']
+	data = response.json()
+
+	return data['download']
+
 
 
 def get_yt_mp4(vd_url):
@@ -97,38 +102,35 @@ def get_yt_mp4(vd_url):
 
 
 def get_ig_vd(vd_url):
-	url = "https://all-media-downloader1.p.rapidapi.com/all"
-	payload = (
-		f"-----011000010111000001101001\r\n"
-		"Content-Disposition: form-data; name=\"url\"\r\n\r\n"
-		f"{vd_url}\r\n"
-		"-----011000010111000001101001--\r\n"
-	)
+	url = "https://instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com/get-info-rapidapi"
+
+	querystring = {"url": vd_url}
 
 	headers = {
 		"x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
-		"x-rapidapi-host": "all-media-downloader1.p.rapidapi.com",
-		"Content-Type": "multipart/form-data; boundary=---011000010111000001101001"
+		"x-rapidapi-host": "instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com"
+	}
+
+	response = requests.get(url, headers=headers, params=querystring)
+	data = response.json()
+
+	return data['download_url']
+
+
+def tiktok_vd(vd_url):
+	url = "https://snap-video3.p.rapidapi.com/download"
+
+	payload = {"url": vd_url}
+
+	headers = {
+		"x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
+		"x-rapidapi-host": "snap-video3.p.rapidapi.com",
+		"Content-Type": "application/x-www-form-urlencoded"
 	}
 
 	response = requests.post(url, data=payload, headers=headers)
-	data = response.json()
-
-	return data['url']
-
-def tiktok_vd(vd_url):
-	url = "https://social-download-all-in-one.p.rapidapi.com/v1/social/autolink"
-
-	payload = {"url": vd_url}
-	headers = {
-		"x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
-		"x-rapidapi-host": "social-download-all-in-one.p.rapidapi.com",
-		"Content-Type": "application/json"
-	}
-
-	response = requests.post(url, json=payload, headers=headers)
 	medias = response.json().get('medias', {})
-	video_url = medias[1].get('url', None)
+	video_url = medias[0].get('url', None)
 	return video_url
 
 
