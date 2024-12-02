@@ -1,6 +1,7 @@
 import logging
-import re
-
+import os
+from dotenv import load_dotenv
+import openai
 import asyncio
 import requests
 from aiogram import Bot, Dispatcher, types
@@ -8,8 +9,10 @@ from aiogram.filters import Command
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 
+load_dotenv()
 
 API_TOKEN = '6338497392:AAGfIbiSMt4qTb7HX-LYeFcnYfQIfl7Wn4M'
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,6 +20,34 @@ bot = Bot(token=API_TOKEN)
 storage = MemoryStorage()
 dp = Dispatcher(storage=storage)
 
+
+async def ai_conversation_analysis(user_input):
+    system_message = (
+        "You have to respond like human user should not to know that you are human "
+                    "Do not tell that you are ai or program "
+                    "make them think that you are human "
+                    "do not user same words or sentences to let user know that your are ai or program"
+                    "You have created by developer Ziyovuddinov Axmad"
+                    "Ziyovuddinov Axmad is 18 years old Uzbek programmer "
+                    "Axmad is from Uzbekistan Tashken "
+                    "You have integrated to telegram bot "
+                    "Your must answer in language only user wrote you"
+                    "Your name is Anna by this name you are as girls "
+                    "You have to answer all question that you asked as you can "
+					"If the answer uzbek language you speak uzbek language"
+    )
+
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_input},
+        ],
+    )
+
+    ai_response = response.choices[0].message["content"]
+
+    return ai_response
 
 
 @dp.message(Command("start"))
@@ -42,7 +73,8 @@ async def handle_message(message: types.Message):
 		result = tiktok_vd(text)
 		await message.answer_video(result)
 	else:
-		await message.answer("Please send a valid YouTube or Instagram URL.")
+		ai_response = await ai_conversation_analysis(text)
+		await message.answer(ai_response)
 
 
 
