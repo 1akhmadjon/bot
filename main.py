@@ -58,7 +58,7 @@ async def send_welcome(message: types.Message):
 @dp.message()
 async def handle_message(message: types.Message):
 	text = message.text
-
+	
 	if text.startswith(("https://youtube.com", "https://youtu.be/")):
 		keyboard = InlineKeyboardMarkup(inline_keyboard=[
 			[InlineKeyboardButton(text="Video", callback_data=f"yt_video_{text}")],
