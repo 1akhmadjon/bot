@@ -66,7 +66,7 @@ async def handle_message(message: types.Message):
 		])
 		await message.answer("Choose the format:", reply_markup=keyboard)
 
-	elif text.startswith("https://www.instagram.com/"):
+	elif text.startswith(("https://www.instagram.com/", "https://instagram.com")):
 		result = get_ig_vd(text)
 		await message.answer_video(result)
 	elif text.startswith(("https://vt.tiktok.com/", "https://tiktok.com")):
