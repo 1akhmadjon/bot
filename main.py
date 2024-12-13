@@ -134,19 +134,23 @@ def get_yt_mp4(vd_url):
 
 
 def get_ig_vd(vd_url):
-    url = "https://instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com/get-info-rapidapi"
+    url = "https://social-all-in-one.p.rapidapi.com/info"
 
-    querystring = {"url": vd_url}
+    querystring = {"format": "json", "url": vd_url}
 
     headers = {
         "x-rapidapi-key": "eea3e289a0msh912ea349e900e8fp19ac32jsn215363fc2737",
-        "x-rapidapi-host": "instagram-downloader-download-instagram-videos-stories1.p.rapidapi.com"
+        "x-rapidapi-host": "social-all-in-one.p.rapidapi.com",
+        "Content-Type": "application/json"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
     data = response.json()
 
-    return data['download_url']
+    formats = data.get('formats', [])
+    for format in formats:
+        if len(format) == 17:
+            return format.get('url')
 
 
 def tiktok_vd(vd_url):
